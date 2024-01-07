@@ -31,31 +31,22 @@ class BingApi {
 			// If the account ran out of credits, use slowmode, otherwise let the parameter determine
 			let response = await this.#sendRequest(credits > 0 ? isSlowMode : true, payload)
 			console.log(`status is ${response.status}`)
+
+			// Error handlers
 			if (response.status === 200) {
 				const responseHtml = await response.text()
-				if (responseHtml.includes('gil_err_tc')) {
-          throw 'Blocked prompt'
+				const $ = cheerio.load(responseHtml)
+				if ($('gilen_son').hasClass('show_n')) {
+					throw 'Dalle-3 is currently unavailable'
+				} else if ($('.gil_err_img.rms_img').length === 2) {
+					throw 'Invalid cookie'
+				} else if ($('.gil_err_img.rms_img').length === 4) {
+          throw 'Results have been blocked'
+				} else {
+					throw 'Unknown error'
 				}
-				throw 'Either a problem with bing or your account is already generating'
 			}
 
-			// Error when using slow mode
-			// if (response.status === 200 && isSlowMode) {
-			// 	throw 'Account is already generating'
-			// }
-
-			// // Error when using fast mode
-			// if (response.status === 200 && !isSlowMode) {
-			// 	console.log('Blocked or you ran out of credits. trying with slow mode:')
-			// 	response = await this.#sendRequest(true, payload)
-
-			// 	// Just incase it still doesn't work
-			// 	if (response.status === 200) {
-			// 		throw 'Account is already generating'
-			// 	}
-			// }
-
-			// console.log('response status is', response.status)
 			const eventId = response.headers.get('x-eventid')
 			console.log(`eventId is ${eventId}`)
 
@@ -73,7 +64,11 @@ class BingApi {
 			mode: 'cors',
 		})
 		const html = await response.text()
+		console.log(`html is:`)
+		// console.log(html)
 		const $ = cheerio.load(html)
+		console.log($('#gilen_son'))
+		console.log($('#gilen_son').hasClass('show_n'))
 		return $('#token_bal').text()
 	}
 
