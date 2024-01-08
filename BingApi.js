@@ -27,6 +27,9 @@ class BingApi {
 		try {
 			const payload = `q=${encodeURIComponent(prompt)}`
 			const credits = await this.getCredits()
+      if (!credits) {
+        credits = 0 // Just incase it fails to get the credits
+      }
 			console.log(`${credits} credits`)
 			// If the account ran out of credits, use slowmode, otherwise let the parameter determine
 			let response = await this.#sendRequest(credits > 0 ? isSlowMode : true, payload)
