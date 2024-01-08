@@ -36,20 +36,19 @@ class BingApi {
 			if (response.status === 200) {
 				const responseHtml = await response.text()
 				const $ = cheerio.load(responseHtml)
-				if ($('gilen_son').hasClass('show_n')) {
+        const errorAmount = $('.gil_err_img.rms_img').length
+				if ($('#gilen_son').hasClass('show_n') || errorAmount === 2 && (credits > 0 && isSlowMode)) {
 					throw 'Dalle-3 is currently unavailable'
-				} else if ($('.gil_err_img.rms_img').length === 2) {
+				} else if (errorAmount === 2) {
 					throw 'Invalid cookie'
-				} else if ($('.gil_err_img.rms_img').length === 4) {
-          throw 'Results have been blocked'
+				} else if (errorAmount === 4) {
+					throw 'Prompt has been blocked'
 				} else {
 					throw 'Unknown error'
 				}
 			}
 
 			const eventId = response.headers.get('x-eventid')
-			console.log(`eventId is ${eventId}`)
-
 			console.log('now moving to getting the images:')
 			this.#retrieveImages(eventId)
 		} catch (error) {
@@ -64,11 +63,11 @@ class BingApi {
 			mode: 'cors',
 		})
 		const html = await response.text()
-		console.log(`html is:`)
+		// console.log(`html is:`)
 		// console.log(html)
 		const $ = cheerio.load(html)
-		console.log($('#gilen_son'))
-		console.log($('#gilen_son').hasClass('show_n'))
+		// console.log($('#gilen_son'))
+		// console.log($('#gilen_son').hasClass('show_n'))
 		return $('#token_bal').text()
 	}
 
