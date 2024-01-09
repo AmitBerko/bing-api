@@ -26,7 +26,7 @@ class BingApi {
 	async createImages(prompt, isSlowMode) {
 		try {
 			const payload = `q=${encodeURIComponent(prompt)}`
-			const credits = await this.getCredits()
+			let credits = await this.getCredits()
       if (!credits) {
         credits = 0 // Just incase it fails to get the credits
       }
