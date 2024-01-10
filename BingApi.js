@@ -53,7 +53,7 @@ class BingApi {
 
 			const eventId = response.headers.get('x-eventid')
 			console.log('now moving to getting the images:')
-			this.#retrieveImages(eventId)
+			return await this.#retrieveImages(eventId)
 		} catch (error) {
 			console.log(`error is ${error}`)
 		}
@@ -134,7 +134,6 @@ class BingApi {
 					results.push(goodLink)
 				}
 
-				console.log(results)
 				return results
 			}
 		} catch (error) {
