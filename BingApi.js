@@ -27,9 +27,9 @@ class BingApi {
 		try {
 			const payload = `q=${encodeURIComponent(prompt)}`
 			let credits = await this.getCredits()
-      if (!credits) {
-        credits = 0 // Just incase it fails to get the credits
-      }
+			if (!credits) {
+				credits = 0 // Just incase it fails to get the credits
+			}
 			console.log(`${credits} credits`)
 			// If the account ran out of credits, use slowmode, otherwise let the parameter determine
 			let response = await this.#sendRequest(credits > 0 ? isSlowMode : true, payload)
@@ -39,9 +39,14 @@ class BingApi {
 			if (response.status === 200) {
 				const responseHtml = await response.text()
 				const $ = cheerio.load(responseHtml)
-        const errorAmount = $('.gil_err_img.rms_img').length
-				if ($('#gilen_son').hasClass('show_n') || errorAmount === 2 && (credits > 0 && isSlowMode)) {
-					throw 'Dalle-3 is currently unavailable'
+				const errorAmount = $('.gil_err_img.rms_img').length
+				if (!isSlowMode && credits > 0 && $('#gilen_son').hasClass('show_n')) {
+          throw 'Dalle-3 is currently unavailable due to high demand'
+				} else if (
+					$('#gilen_son').hasClass('show_n') ||
+					(errorAmount === 2 && credits > 0 && isSlowMode)
+				) {
+					throw 'Slow mode is currently unavailable due to high demand'
 				} else if (errorAmount === 2) {
 					throw 'Invalid cookie'
 				} else if (errorAmount === 4) {
