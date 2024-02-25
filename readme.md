@@ -25,7 +25,7 @@ const bingApi = new BingApi('Your _U Cookie Value')
 
 ## Create Images
 
-### `createImages(prompt: string, isSlowMode: boolean): Promise<string[]>`
+### `createImages(prompt: string, isSlowMode: boolean): Promise<string>`
 
 - **Parameters:**
 
